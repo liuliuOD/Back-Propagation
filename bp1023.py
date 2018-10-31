@@ -31,13 +31,16 @@ class NeuronNet:
 		dO = self.output.bpActiv()
 		# ∂L/∂netO
 		dLnetO = [a*b for a,b in zip(dL, dO)]
+		# ∂H/∂netH
+		dH = self.hidden.bpActiv()
 		# ∂L/∂H
 		dLH = self.hidden.bpHidden(self.output.neurons, dLnetO)
-
+		# ∂L/∂netH
+		dLnetH = [a*b for a,b in zip(dH, dLH)]
 		# ∂netO/∂Wo
 		dnetO = self.output.weightGD(dLnetO)
 		# ∂netH/∂Wh
-		dnetH = self.hidden.weightGD(dLH)
+		dnetH = self.hidden.weightGD(dLnetH)
 
 		# weight update
 		self.output.optimizer(dnetO)
@@ -76,7 +79,7 @@ class Layer:
 					self.neurons[i].weight.append(random.random())
 
 	def forWard(self, input):
-		# svae for back propagation
+		# save for back propagation
 		self.input = input
 		self.output = []
 		for i in range(len(self.neurons)):
@@ -130,5 +133,5 @@ class Neuron:
 if __name__ == '__main__':
 	nn = NeuronNet(hidden_weight = [0.15, 0.2, 0.25, 0.3],
 	 hidden_bias = 0.35, output_weight = [0.4, 0.45, 0.5, 0.55], output_bias = 0.6)
-	for i in range(1000):
-		nn.train([0.05, 0.1], [0.01, 0.9])
+	for i in range(2):
+		nn.train([0.05, 0.1], [0.01, 0.09])
