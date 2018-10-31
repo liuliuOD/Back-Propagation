@@ -1,4 +1,6 @@
-
+# ======CALL BY layer.Layer======
+# 
+# 
 class Optimizer:
 	def __init__(self, neurons, use_func = "GD"):
 		self.neurons = neurons

@@ -25,7 +25,7 @@ class ActivationFunc:
 			result = output
 		return result
 
-# ===========CALL BY ???.!!!===========
+# ===========CALL BY Network===========
 # 
 # 
 class Loss:
