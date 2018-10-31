@@ -23,7 +23,7 @@ class Network:
 			gradient = self.h2.backPropagation(gradient, self.optimizer)
 			gradient = self.h1.backPropagation(gradient, self.optimizer)
 			print("LOSS [{}] :{}".format(i, loss))
-			print("Predict :{}".format(o1))
+			print("Predict [{}]:{}".format(i, o1))
 
 if __name__ == '__main__':
 	train = Network()
