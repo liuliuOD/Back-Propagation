@@ -1,6 +1,5 @@
 import random
 import hf.nn as nn
-import hf.train as train
 
 class Layer:
 	def __init__(self, in_num, out_num, w = None, bias = 0, active = None):
@@ -13,6 +12,7 @@ class Layer:
 		count = 0
 		for o in range(out_num):
 			for i in range(in_num):
+				self.neurons[o].gradient.append([])
 				if w:
 					self.neurons[o].weight.append(w[count])
 					count += 1
@@ -22,22 +22,45 @@ class Layer:
 	def feedForward(self, input):
 		self.input = input
 		self.output = []
+		
 		for n in range(len(self.neurons)):
 			self.neurons[n].input = 0
 			for i in range(len(input)):
 				self.neurons[n].input += self.neurons[n].weight[i]* input[i]
-			
 			self.neurons[n].input += self.bias
-			self.neurons[n].output = self.active.feedForward(self.neurons[n].input)
-			self.output.append(self.neurons[n].output)
-		return self.output
-
-	def backPropagation(self, derivation, opti_func = "GD"):
-		gradient = []
+			
 
 		for n in range(len(self.neurons)):
-			self.neurons[n].gradient = []
-			self.neurons[n].derivation = self.active.backForward(self.neurons[n].output)* derivation[n]
+			self.neurons[n].output = self.active.feedForward(self.neurons, n)
+			self.output.append(self.neurons[n].output)
+		
+		return self.output
+
+	def backPropagation(self, derivation, targetMax = None):
+		gradient = []
+		# if targetMax:
+		# 	for i in range(len(self.input)):
+		# 		for n in range(len(self.neurons)):
+		# 			if n == targetMax:
+		# 				self.neurons[n].gradient[i].append((self.neurons[n].output - 1)* self.input[i])
+		# 			else:
+		# 				self.neurons[n].gradient[i].append((self.neurons[n].output)* self.input[i])
+		# 	for i in range(len(self.input)):
+		# 		tmp = 0
+		# 		for n in range(len(self.neurons)):
+		# 			if n == targetMax:
+		# 				tmp += (self.neurons[n].output - 1)* self.neurons[n].weight[i]
+		# 			else:
+		# 				tmp += (self.neurons[n].output)* self.neurons[n].weight[i]
+		# 		gradient.append(tmp)
+		# else:
+		for n in range(len(self.neurons)):
+			
+			self.neurons[n].derivation = self.active.backForward(self.neurons, n, targetMax)* derivation[n]
+			# if n == targetMax:
+			# 	self.neurons[n].derivation = -(1 - self.neurons[n].output)
+			# else:
+			# 	self.neurons[n].derivation = self.neurons[n].output
 
 		for i in range(len(self.input)):
 			tmp = 0
@@ -48,10 +71,8 @@ class Layer:
 
 		for i in range(len(self.input)):
 			for n in range(len(self.neurons)):
-				self.neurons[n].gradient.append(self.neurons[n].derivation* self.input[i])
+				self.neurons[n].gradient[i].append(self.neurons[n].derivation* self.input[i])
 		
-		train.Optimizer(self.neurons, opti_func)
-
 		return gradient
 
 
