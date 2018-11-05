@@ -2,12 +2,14 @@ import random
 import hf.nn as nn
 
 class Layer:
-	def __init__(self, in_num, out_num, w = None, bias = 0, active = None):
-		self.bias = bias
+	def __init__(self, in_num, out_num, w = None, bias = None, active = None):
 		self.neurons = []
 		self.active = nn.ActivationFunc(active)
 		for i in range(out_num):
-			self.neurons.append(Neuron(bias))
+			if bias:
+				self.neurons.append(Neuron(bias[i]))
+			else:
+				self.neurons.append(Neuron(random.random()))
 
 		count = 0
 		for o in range(out_num):
@@ -27,7 +29,7 @@ class Layer:
 			self.neurons[n].input = 0
 			for i in range(len(input)):
 				self.neurons[n].input += self.neurons[n].weight[i]* input[i]
-			self.neurons[n].input += self.bias
+			self.neurons[n].input += self.neurons[n].bias
 			
 
 		for n in range(len(self.neurons)):
@@ -56,22 +58,19 @@ class Layer:
 		# else:
 		for n in range(len(self.neurons)):
 			
-			self.neurons[n].derivation = self.active.backForward(self.neurons, n, targetMax)* derivation[n]
-			# if n == targetMax:
-			# 	self.neurons[n].derivation = -(1 - self.neurons[n].output)
-			# else:
-			# 	self.neurons[n].derivation = self.neurons[n].output
+			# self.neurons[n].derivation = self.active.backForward(self.neurons, n, targetMax)* derivation[n]
+			self.neurons[n].derivation.append(self.active.backForward(self.neurons, n, targetMax)* derivation[n])
 
 		for i in range(len(self.input)):
 			tmp = 0
 			for neur in self.neurons:
-				tmp += neur.derivation* neur.weight[i]
+				tmp += neur.derivation[-1]* neur.weight[i]
 			gradient.append(tmp)
 
 
 		for i in range(len(self.input)):
 			for n in range(len(self.neurons)):
-				self.neurons[n].gradient[i].append(self.neurons[n].derivation* self.input[i])
+				self.neurons[n].gradient[i].append(self.neurons[n].derivation[-1]* self.input[i])
 		
 		return gradient
 
@@ -85,5 +84,5 @@ class Neuron:
 		self.weight = []
 		self.input = 0
 		self.output = 0
-		self.derivation = 0
+		self.derivation = []
 		self.gradient = []
