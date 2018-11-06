@@ -49,9 +49,12 @@ class ActivationFunc:
 	def backForward(self, neurons, output, targetMax):
 		index = {'sigmoid': self.bp_sigmoid, 'softmax': self.bp_softmax, 'relu': self.bp_relu, }
 		bpFunc = index.get(self.activeFunc, 'BP Function Not Exist.')
-		return bpFunc(neurons, output, targetMax)
+		if targetMax is None:
+			return bpFunc(neurons, output)
+		else:
+			return bpFunc(neurons, output, targetMax)
 
-	def bp_sigmoid(self, neurons, output, targetMax):
+	def bp_sigmoid(self, neurons, output):
 		result = neurons[output].output* (1- neurons[output].output)
 		return result
 
@@ -62,7 +65,7 @@ class ActivationFunc:
 			result = -neurons[output].output* neurons[targetMax].output
 		return result
 
-	def bp_relu(self, neurons, output, targetMax):
+	def bp_relu(self, neurons, output):
 		if neurons[output].output > 0:
 			result = 1
 		else:

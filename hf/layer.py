@@ -6,7 +6,7 @@ class Layer:
 		self.neurons = []
 		self.active = nn.ActivationFunc(active)
 		for i in range(out_num):
-			if bias:
+			if bias != None:
 				self.neurons.append(Neuron(bias[i]))
 			else:
 				self.neurons.append(Neuron(random.random()))
@@ -15,7 +15,7 @@ class Layer:
 		for o in range(out_num):
 			for i in range(in_num):
 				self.neurons[o].gradient.append([])
-				if w:
+				if w != None:
 					self.neurons[o].weight.append(w[count])
 					count += 1
 				else:
